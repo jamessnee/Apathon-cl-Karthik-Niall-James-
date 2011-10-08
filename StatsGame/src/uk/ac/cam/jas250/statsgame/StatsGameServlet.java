@@ -26,6 +26,12 @@ public class StatsGameServlet extends HttpServlet {
 		
 	}
 	
+	/*
+	 * NOTE TO KARTHIK
+	 * I was expecting to send a url to the server from an app like:
+	 * http://www.trumpus-appathon.appspot.com/statsgame?playerId=12345,gameId=67789,metricChoice=<somethingToDoWithTheMetric>
+	 * I would then expect JSON data to be returned. Is this what you were thinking?
+	 */
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
 		
