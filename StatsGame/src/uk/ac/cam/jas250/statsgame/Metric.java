@@ -27,11 +27,11 @@ public class Metric {
 	@Persistent
 	private Set<Stat> stats;
 
-	static final int LOCALAUTH = 1;
-	static final int MLSOA = 2;
+	static final int LOCALAUTH = 5;
+	static final int MLSOA = 4;
 	static final int LLSOA = 3;
-	static final int WARD = 4;
-	static final int OUTPUTAREA = 5;
+	static final int WARD = 2;
+	static final int OUTPUTAREA = 1;
 	
 	
 	/*
@@ -44,16 +44,15 @@ public class Metric {
 	/*
 	 * ACCESSORS
 	 */
+	public int getGranularity(){
+		return granularity;
+	}
 	
 	//Key
 	public Key getKey(){
 		return key;
 	}
 	
-	//Granularity
-	public int getGranularity(){
-		return granularity;
-	}
 	public void setGranularity(int granularity){
 		this.granularity = granularity;
 	}

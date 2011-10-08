@@ -11,8 +11,11 @@ import java.util.Set;
 public class Game {
 	Set<Player> players;
 	final int MINCOUNT = 3;
-	int minGranularity;
+	int maxGranularity;
 	Set<Metric> metrics;
+	Set<Player> playerTurnList;
+	boolean turnInProgress;
+	int playersWaitingForResult;
 	
 	//indicates whether the winning value is the highest or the lowest
 	static final int HIGHWIN = 0;
@@ -21,6 +24,8 @@ public class Game {
 	public Game(Set<Metric> m){
 		metrics = m;
 		players = new HashSet<Player>();
+		playerTurnList = new HashSet<Player>();
+		turnInProgress = false;
 	}
 	
 	public Set<Player> getPlayers(){
@@ -32,43 +37,57 @@ public class Game {
 	}
 	
 	public Card getCard(Player p){
-		return new Card();//DEBUG STUB
+		if(!turnInProgress){//A turn is in progress when the first player calls
+			turnInProgress = true;
+			playersWaitingForResult = 0;
+			calcMaxGranularity();
+		}
+		Player nextPlayer = null;
+		Iterator<Player> it = playerTurnList.iterator();
+		while(nextPlayer == null){
+			while(it.hasNext() && nextPlayer == null){
+				Player temp = it.next();
+				if(players.contains(temp)) //if temp is still playing...
+					nextPlayer = temp;
+			}
+			if(nextPlayer == null){
+				playerTurnList = new HashSet<Player>(players);
+			}
+		}
 	}
 	
-<<<<<<< HEAD
 	/*
 	 * Player with turn passes chosen metric, other
 	 * players pass null, return winning player
 	 */
 	public Player choose(Metric chosenMetric, int direction){
-		boolean resultAvailable = false;
 		Iterator<Player> it = players.iterator();
 		Player winningPlayer = it.next(); //choose any player to initialise
 		String region = NeighbourhoodStatQuery.getRegionFromPostcode(
-				winningPlayer.postcode, chosenMetric.granularity);
+				winningPlayer.getPostcode(), chosenMetric.getGranularity());
 		Stat s = NeighbourhoodStatQuery.getStat(chosenMetric, region);
-		double currentBest = s.value;
+		double currentBest = s.getValue();
 		
 		if (chosenMetric != null){ //if called by choosing player...
 			while(it.hasNext()){
 				Player testPlayer = it.next();
 				region = NeighbourhoodStatQuery.getRegionFromPostcode(
-						testPlayer.postcode, chosenMetric.granularity);
+						testPlayer.getPostcode(), chosenMetric.getGranularity());
 				s = NeighbourhoodStatQuery.getStat(chosenMetric, region);
-				if(direction == HIGHWIN && s.value > currentBest){
-					currentBest = s.value;
+				if(direction == HIGHWIN && s.getValue() > currentBest){
+					currentBest = s.getValue();
 					winningPlayer = testPlayer;
 				}
-				else if(direction == LOWWIN && s.value < currentBest){
-					currentBest = s.value;
+				else if(direction == LOWWIN && s.getValue() < currentBest){
+					currentBest = s.getValue();
 					winningPlayer = testPlayer;
 				}		
 			}
-			resultAvailable = true;
 		}
 		
-		//block until result is available
-		while(!resultAvailable){
+		//block until all players have reached this point
+		playersWaitingForResult++;
+		while(playersWaitingForResult < players.size()){
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
@@ -78,15 +97,15 @@ public class Game {
 		
 		//return result to all players
 		return winningPlayer;
-=======
+	}
+
 	public Card choose(){
 		return new Card();//DEBUG STUB
->>>>>>> 97acc4befdfa9f10589271aaa8a7e881c0db1e51
 	}
 	
-	public void prepareGame(){
+	public void calcMaxGranularity(){
 		//TODO calc this
-		minGranularity = Metric.LOCALAUTH;
+		maxGranularity = Metric.LOCALAUTH;
 	}
 
 }
