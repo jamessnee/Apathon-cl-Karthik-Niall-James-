@@ -11,9 +11,9 @@ public class Service {
 	Set<Metric> metrics;
 	
 	public Service(){
-		l = new Lobby();
-		players = new HashSet<Player>();
 		metrics = new HashSet<Metric>();
+		l = new Lobby(metrics);
+		players = new HashSet<Player>();
 	}
 	
 	public Lobby getLobby(){
