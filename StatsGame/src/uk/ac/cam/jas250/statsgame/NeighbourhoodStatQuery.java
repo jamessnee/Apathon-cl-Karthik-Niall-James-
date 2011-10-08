@@ -3,9 +3,10 @@ package uk.ac.cam.jas250.statsgame;
 import java.io.IOException;
 import java.net.URL;
 
-import com.google.appengine.api.urlfetch.*;
+import org.xml.sax.*;
+import javax.xml.parsers.*;
 
-import java.util.List;
+import com.google.appengine.api.urlfetch.*;
 
 public class NeighbourhoodStatQuery {
 	
@@ -18,18 +19,9 @@ public class NeighbourhoodStatQuery {
 			String url_str = "http://neighbourhood.statistics.gov.uk/NDE2/Disco/FindAreas?Postcode="+postcode;
 			URL url = new URL(url_str);
 			HTTPResponse response = fetcher.fetch(url);
+			String responseString = new String(response.getContent());
 			
-			byte[] content = response.getContent();
-			
-			int responseCode = response.getResponseCode();
-			System.out.println(responseCode);
-			List<HTTPHeader> headers = response.getHeaders();
-			
-			for(HTTPHeader header: headers){
-				String headerName = header.getName();
-				String headerValue = header.getValue();
-			}
-			
+			String areaId = parseXMLResponsefromRegion(responseString);
 		}catch(IOException e){
 			e.printStackTrace();
 		}
@@ -39,6 +31,11 @@ public class NeighbourhoodStatQuery {
 	
 	public static Stat getStat(Metric m, String region){
 		return new Stat("",0.0);
+	}
+	
+	
+	private static String parseXMLResponsefromRegion(String responseString){
+		return "";
 	}
 
 }

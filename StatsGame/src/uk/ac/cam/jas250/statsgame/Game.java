@@ -67,6 +67,8 @@ public class Game {
 			return new Card(getPlayerStats(p, currentMetrics), 
 					p.equals(nextPlayer), false);
 		}
+		
+		return new Card();
 	}
 	
 	/*
