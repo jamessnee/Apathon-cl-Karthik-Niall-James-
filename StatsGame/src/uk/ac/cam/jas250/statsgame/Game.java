@@ -54,6 +54,8 @@ public class Game {
 				playerTurnList = new HashSet<Player>(players);
 			}
 		}
+		
+		return new Card();
 	}
 	
 	/*
