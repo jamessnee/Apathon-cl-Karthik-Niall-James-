@@ -25,11 +25,11 @@ public class Game {
 	}
 	
 	public Card getCard(Player p){
-		
+		return new Card();//DEBUG STUB
 	}
 	
 	public Card choose(){
-		
+		return new Card();//DEBUG STUB
 	}
 	
 	public void prepareGame(){
