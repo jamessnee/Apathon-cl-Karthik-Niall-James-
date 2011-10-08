@@ -77,11 +77,8 @@ public class Game {
 		}
 		
 		//return result to all players
-		return winningPlayer;
-=======
 	public Card choose(){
 		return new Card();//DEBUG STUB
->>>>>>> 97acc4befdfa9f10589271aaa8a7e881c0db1e51
 	}
 	
 	public void prepareGame(){
