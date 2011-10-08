@@ -31,7 +31,6 @@ public class Stat {
 	/*
 	 * ACCESSORS
 	 */
-	}
 	
 	//Key
 	public Key getKey(){
