@@ -4,11 +4,28 @@ import uk.ac.cam.jas250.statsgame.Stat;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 
+import com.google.appengine.api.datastore.Key;
+
+@PersistenceCapable
 public class Metric {
-	int granularity;
-	String name;
-	Set<Stat> stats;
+	
+	@PrimaryKey
+    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+    private Key key;
+	
+	@Persistent
+	private int granularity;
+	
+	@Persistent
+	private String name;
+	
+	@Persistent
+	private Set<Stat> stats;
 
 	static final int LOCALAUTH = 1;
 	static final int MLSOA = 2;
@@ -16,12 +33,52 @@ public class Metric {
 	static final int WARD = 4;
 	static final int OUTPUTAREA = 5;
 	
+	
+	/*
+	 * CONSTRUCTORS
+	 */
 	public Metric(){
 		stats = new HashSet<Stat>(); 
 	}
 	
+	/*
+	 * ACCESSORS
+	 */
+	
+	//Key
+	public Key getKey(){
+		return key;
+	}
+	
+	//Granularity
 	public int getGranularity(){
 		return granularity;
 	}
-
+	public void setGranularity(int granularity){
+		this.granularity = granularity;
+	}
+	
+	//Name
+	public String getName(){
+		return name;
+	}
+	public void setName(String name){
+		this.name = name;
+	}
+	
+	//Stats
+	public Set<Stat> getStats(){
+		return stats;
+	}
+	public void setStats(Set<Stat> stats){
+		this.stats = stats;
+	}
+	
+	/*
+	 * METHODS
+	 */
+	public void addStat(Stat st){
+		stats.add(st);
+	}
+	
 }
