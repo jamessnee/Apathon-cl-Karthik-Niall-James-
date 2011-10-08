@@ -10,7 +10,6 @@ public class Lobby {
 	
 	Set<Player> currentPlayers;
 	Game nextGame;
-	Set<Metric> metrics;
 	
 	public Lobby(){
 		currentPlayers = new HashSet<Player>();
