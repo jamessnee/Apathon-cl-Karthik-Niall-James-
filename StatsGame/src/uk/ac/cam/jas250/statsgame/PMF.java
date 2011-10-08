@@ -9,6 +9,8 @@ public final class PMF {
 	
 	private PMF(){};
 	
+	
+	//Make sure only a single instance is returned.
 	public static PersistenceManagerFactory get(){
 		return pmfFactory;
 	}
