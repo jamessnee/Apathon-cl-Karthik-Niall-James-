@@ -1,36 +1,37 @@
 package uk.ac.cam.jas250.statsgame;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
-import com.sun.corba.se.impl.oa.poa.ActiveObjectMap.Key;
+import javax.jdo.PersistenceManager;
 
 
 
 public class Service {
 	
 	Lobby l;
-	HashMap<Key, Player> players;
-	Set<Metric> metrics;
+	PersistenceManager pm = PMF.get().getPersistenceManager();
 	
 	public Service(){
-		metrics = new HashMap<Metric>();
-		l = new Lobby(metrics);
-		players = new HashSet<Key, Player>();
+		l = new Lobby();
 	}
 	
 	public Lobby getLobby(){
 		return l;
 	}
 	
-	public String createPlayer(Player p){
-		players.put(p.getKey(), p);
-		return "";//TODO map key to string p.getKey();
+	public long createPlayer(Player p){
+		try {
+			pm.makePersistent(p);
+		} finally {
+			pm.close();
+		}
+		
+		return p.getKey().getId();
 	}
 	
-	public Player getPlayer(String keyString){
-		//TODO map string to key
-		return new Player("", "");
+	public Player getPlayer(long id){
+		return pm.getObjectById(Player.class, id);
+	}
+	
+	public Metric getMetric(long id){
+		return pm.getObjectById(Metric.class, id);
 	}
 
 }

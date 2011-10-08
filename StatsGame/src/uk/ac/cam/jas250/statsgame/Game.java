@@ -12,7 +12,6 @@ public class Game {
 	Set<Player> players;
 	final int MINCOUNT = 3;
 	int maxGranularity;
-	Set<Metric> metrics;
 	Set<Player> playerTurnList;
 	boolean turnInProgress;
 	int playersWaiting;
@@ -22,8 +21,7 @@ public class Game {
 	static final int HIGHWIN = 1;
 	static final int LOWWIN = -1;
 	
-	public Game(Set<Metric> m){
-		metrics = m;
+	public Game(){
 		players = new HashSet<Player>();
 		playerTurnList = new HashSet<Player>();
 		turnInProgress = false;
@@ -132,12 +130,15 @@ public class Game {
 		Set<Stat> s = new HashSet<Stat>();
 		Iterator<Metric> it = metrics.iterator();
 		while(it.hasNext()){
-			Metric m = it.next();
-			String region = NeighbourhoodStatQuery.getRegionFromPostcode(
-					p.getPostcode(), m.getGranularity());
-			s.add(NeighbourhoodStatQuery.getStat(m, region));
+			s.add(getPlayerStat(p, it.next()));
 		}
 		return s;
+	}
+	
+	private Stat getPlayerStat(Player p, Metric m){
+		String region = NeighbourhoodStatQuery.getRegionFromPostcode(
+				p.getPostcode(), m.getGranularity());
+		return NeighbourhoodStatQuery.getStat(m, region);
 	}
 
 }

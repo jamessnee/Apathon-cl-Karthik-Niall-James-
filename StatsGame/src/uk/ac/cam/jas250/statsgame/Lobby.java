@@ -12,10 +12,9 @@ public class Lobby {
 	Game nextGame;
 	Set<Metric> metrics;
 	
-	public Lobby(Set<Metric> m){
-		metrics = m;
+	public Lobby(){
 		currentPlayers = new HashSet<Player>();
-		nextGame = new Game(m);
+		nextGame = new Game();
 	}
 	
 	public void join(Player p){
@@ -32,7 +31,7 @@ public class Lobby {
 			}
 		}
 		Game temp = nextGame;
-		nextGame = new Game(metrics);
+		nextGame = new Game();
 		return temp;
 	}
 	
