@@ -15,7 +15,8 @@ public class Game {
 	Set<Metric> metrics;
 	Set<Player> playerTurnList;
 	boolean turnInProgress;
-	int playersWaitingForResult;
+	int playersWaiting;
+	Set<Metric> currentMetrics;
 	
 	//indicates whether the winning value is the highest or the lowest
 	static final int HIGHWIN = 0;
@@ -26,6 +27,7 @@ public class Game {
 		players = new HashSet<Player>();
 		playerTurnList = new HashSet<Player>();
 		turnInProgress = false;
+		playersWaiting = 0;
 	}
 	
 	public Set<Player> getPlayers(){
@@ -37,22 +39,35 @@ public class Game {
 	}
 	
 	public Card getCard(Player p){
-		if(!turnInProgress){//A turn is in progress when the first player calls
-			turnInProgress = true;
-			playersWaitingForResult = 0;
-			calcMaxGranularity();
-		}
+		//wait for all players to call for next card (in case players have left)
 		Player nextPlayer = null;
-		Iterator<Player> it = playerTurnList.iterator();
-		while(nextPlayer == null){
-			while(it.hasNext() && nextPlayer == null){
-				Player temp = it.next();
-				if(players.contains(temp)) //if temp is still playing...
-					nextPlayer = temp;
+		joinPlayers();
+		
+		//now the player list is finalised for this turn
+		if(players.size() < 2){//not enough players, end game
+			return new Card(null, false, true);
+		}
+		else{//deal cards	
+			if(!turnInProgress){//A turn is in progress when the first player calls
+				turnInProgress = true;
+				
+				Iterator<Player> it = playerTurnList.iterator();
+				//remove any players who have left from the turn list
+				while(it.hasNext()){
+					Player temp = it.next();
+					if(!players.contains(temp))
+						playerTurnList.remove(temp);
+				}
+				
+				//select the next player
+				it = playerTurnList.iterator();
+				nextPlayer = it.next();
+				currentMetrics = chooseMetrics();
 			}
-			if(nextPlayer == null){
-				playerTurnList = new HashSet<Player>(players);
-			}
+			//wait for all players before returning
+			joinPlayers();	
+			return new Card(getPlayerStats(p, currentMetrics), 
+					p.equals(nextPlayer), false);
 		}
 	}
 	
@@ -85,27 +100,44 @@ public class Game {
 			}
 		}
 		
-		//block until all players have reached this point
-		playersWaitingForResult++;
-		while(playersWaitingForResult < players.size()){
+		//wait for all players and return
+		joinPlayers();
+		return winningPlayer;
+	}
+	
+	private void joinPlayers(){//wait for all players before returning
+		playersWaiting++;
+		while(playersWaiting < players.size()){
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
-		
-		//return result to all players
-		return winningPlayer;
-	}
-
-	public Card choose(){
-		return new Card();//DEBUG STUB
+		playersWaiting = 0;
 	}
 	
-	public void calcMaxGranularity(){
+	private void calcMaxGranularity(){
 		//TODO calc this
 		maxGranularity = Metric.LOCALAUTH;
+	}
+	
+	private Set<Metric> chooseMetrics(){
+		calcMaxGranularity();
+		//TODO choose metrics
+		return new HashSet<Metric>();
+	}
+	
+	private Set<Stat> getPlayerStats(Player p, Set<Metric> metrics){
+		Set<Stat> s = new HashSet<Stat>();
+		Iterator<Metric> it = metrics.iterator();
+		while(it.hasNext()){
+			Metric m = it.next();
+			String region = NeighbourhoodStatQuery.getRegionFromPostcode(
+					p.getPostcode(), m.getGranularity());
+			s.add(NeighbourhoodStatQuery.getStat(m, region));
+		}
+		return s;
 	}
 
 }
