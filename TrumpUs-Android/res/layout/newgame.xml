@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    
+    <TextView android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="New Game" android:gravity="center" android:textSize="30sp"/>
+    
+    <TextView  android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="Name:" android:textSize="20sp"/>
+    <EditText  android:id="@+id/txtName" android:layout_width="fill_parent" android:layout_height="wrap_content"/>
+    
+    <CheckBox android:text="Manual Postcode" android:id="@+id/chkbxManualPc" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    
+    <TextView  android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="Post Code" android:textSize="20sp"/>
+    <EditText  android:id="@+id/txtPostcode" android:layout_width="fill_parent" android:layout_height="wrap_content" android:enabled="false"/>
+    
+    <Button android:id="@+id/findGame" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="Find me a game!"/>
+</LinearLayout>
