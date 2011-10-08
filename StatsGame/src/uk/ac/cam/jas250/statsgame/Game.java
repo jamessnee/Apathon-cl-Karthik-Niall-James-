@@ -19,8 +19,8 @@ public class Game {
 	Set<Metric> currentMetrics;
 	
 	//indicates whether the winning value is the highest or the lowest
-	static final int HIGHWIN = 0;
-	static final int LOWWIN = 1;
+	static final int HIGHWIN = 1;
+	static final int LOWWIN = -1;
 	
 	public Game(Set<Metric> m){
 		metrics = m;

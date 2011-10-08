@@ -68,5 +68,9 @@ public class Player {
 		// TODO Auto-generated method stub
 		return key.hashCode();
 	}
+	
+	public void updateScore(int newScore){
+		score = newScore;
+	}
 
 }

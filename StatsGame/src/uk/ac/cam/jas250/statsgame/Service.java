@@ -1,32 +1,36 @@
 package uk.ac.cam.jas250.statsgame;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+
+import com.sun.corba.se.impl.oa.poa.ActiveObjectMap.Key;
 
 
 
 public class Service {
 	
 	Lobby l;
-	Set<Player> players;
+	HashMap<Key, Player> players;
 	Set<Metric> metrics;
 	
 	public Service(){
-		metrics = new HashSet<Metric>();
+		metrics = new HashMap<Metric>();
 		l = new Lobby(metrics);
-		players = new HashSet<Player>();
+		players = new HashSet<Key, Player>();
 	}
 	
 	public Lobby getLobby(){
 		return l;
 	}
 	
-	public void createPlayer(Player p){
-		players.add(p);
+	public String createPlayer(Player p){
+		players.put(p.getKey(), p);
+		return "";//TODO map key to string p.getKey();
 	}
 	
-	public void updatePlayer(Player p){
-		players.remove(p);
-		players.add(p);
+	public Player getPlayer(String keyString){
+		//TODO map string to key
+		return new Player("", "");
 	}
 
 }
