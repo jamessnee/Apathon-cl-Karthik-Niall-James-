@@ -9,6 +9,7 @@ public class Service {
 	PersistenceManager pm = PMF.get().getPersistenceManager();
 	
 	public Service(){
+		Lobby l = pm.getObjectById(Lobby.class, Lobby.SINGLETON_KEY);
 		l = new Lobby();
 	}
 	
