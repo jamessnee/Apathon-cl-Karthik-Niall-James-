@@ -5,6 +5,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 
 @PersistenceCapable
 public class Player {
@@ -29,6 +30,8 @@ public class Player {
 	public Player(String name, String postcode){
 		this.setName(name);
 		this.setPostcode(postcode);
+		//REMOVE just for testing
+		//key = KeyFactory.createKey(Player.class.getSimpleName(), name.length());
 	}
 	
 	/*

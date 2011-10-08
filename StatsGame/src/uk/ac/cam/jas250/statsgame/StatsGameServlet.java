@@ -26,10 +26,17 @@ public class StatsGameServlet extends HttpServlet {
 		
 	}
 	
+	/*
+	 * NOTE TO KARTHIK
+	 * I was expecting to send a url to the server from an app like:
+	 * http://www.trumpus-appathon.appspot.com/statsgame?playerId=12345,gameId=67789,metricChoice=<somethingToDoWithTheMetric>
+	 * I would then expect JSON data to be returned. Is this what you were thinking?
+	 */
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
 		
 		REQUEST_TYPE rq = (REQUEST_TYPE) req.getAttribute(HEADER_RQTYPE);
+		System.out.println(rq);
 		Gson gson = new Gson();
 		Player p;
 		
@@ -39,27 +46,27 @@ public class StatsGameServlet extends HttpServlet {
 			s.createPlayer(p);
 			break;
 		case JOIN_LOBBY:
-			p = s.getPlayer(req.getParameter(HEADER_PLAYERID));
+			p = s.getPlayer(Long.parseLong(req.getParameter(HEADER_PLAYERID)));
 			s.getLobby().join(p);
 			break;
 		case JOIN_GAME:
-			p = s.getPlayer(req.getParameter(HEADER_PLAYERID));
-			s.getLobby().getGame(p).getId();
+			p = s.getPlayer(Long.parseLong(req.getParameter(HEADER_PLAYERID)));
+			//s.getLobby().getGame(p).getId();
 			break;
-		case GET_CARD:
-			p = s.getPlayer(req.getParameter(HEADER_PLAYERID));
+		/*case GET_CARD:
+			p = s.getPlayer(Long.parseLong(req.getParameter(HEADER_PLAYERID)));
 			Game g = s.getLobby().getPlayerGame(p);
 			Card c = g.getCard(p);
 			resp.getWriter().println(gson.toJson(c));
 			break;
 		case CHOOSE:
-			p = s.getPlayer(req.getParameter(HEADER_PLAYERID));
+			p = s.getPlayer(Long.parseLong(req.getParameter(HEADER_PLAYERID)));
 			Game g = s.getPlayerGame(p);
 			Metric m = s.getMetric(req.getParameter(HEADER_METRICID));
 			int dir = Integer.parseInt(req.getParameter(HEADER_DIRECTION));
 			Player winner = g.choose(m, dir);
 			resp.getWriter().println(gson.toJson(winner));
-			break;
+			break;*/
 		}
 		
 		resp.setContentType("text/html");
