@@ -2,6 +2,8 @@ package uk.ac.cam.jas250.statsgame;
 import uk.ac.cam.jas250.statsgame.Player;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -25,10 +27,7 @@ public class Lobby {
 	Set<Player> currentPlayers;
 	
 	@Persistent
-	Game nextGame;
-	
-	@Persistent
-	Set<Game> gamesInProgress;
+	List<Game> gamesInProgress;
 	
 	@Persistent
 	Set<Metric> metrics;
@@ -36,7 +35,8 @@ public class Lobby {
 	public Lobby(){
 		key = KeyFactory.createKey(Lobby.class.getSimpleName(), Lobby.SINGLETON_KEY);
 		currentPlayers = new HashSet<Player>();
-		nextGame = new Game();
+		gamesInProgress = new LinkedList<Game>();
+		gamesInProgress.add(new Game());
 	}
 	
 	public void join(Player p){
@@ -45,6 +45,7 @@ public class Lobby {
 	}
 	
 	public Game getGame(Player p){
+		Game nextGame = ((LinkedList<Game>)gamesInProgress).getFirst();
 		nextGame.getPlayers().add(p);
 		while(!nextGame.ready()){
 			try {

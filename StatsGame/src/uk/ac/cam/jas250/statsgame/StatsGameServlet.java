@@ -2,6 +2,7 @@ package uk.ac.cam.jas250.statsgame;
 
 import java.io.IOException;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.servlet.http.*;
 import java.util.logging.Logger;
@@ -40,18 +41,25 @@ public class StatsGameServlet extends HttpServlet {
 
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
-
-			Lobby l = pm.getObjectById(Lobby.class, Lobby.SINGLETON_KEY);
-
-			if (l == null) {
+			Lobby l;
+			try {
+			l = pm.getObjectById(Lobby.class, Lobby.SINGLETON_KEY);
+			} catch (JDOObjectNotFoundException e) {
 				l = new Lobby();
 				pm.makePersistent(l);
+			
 			}
-
-			REQUEST_TYPE rq = (REQUEST_TYPE) req.getAttribute(HEADER_RQTYPE);
+			
+			REQUEST_TYPE rq = REQUEST_TYPE.class.getEnumConstants()[Integer.parseInt(req.getParameter(HEADER_RQTYPE))];
 			Gson gson = new Gson();
 			Player p;
 
+			if (rq == null) {
+				resp.getWriter().println(gson.toJson("No request"));
+				return;
+			}
+	
+			
 			switch (rq) {
 			case CREATE_PLAYER:
 				String name = req.getParameter(HEADER_NEWPLAYER);

@@ -6,15 +6,39 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
+import com.google.appengine.api.datastore.Key;
 
 
+@PersistenceCapable
 public class Game {
+	
+	@PrimaryKey
+    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+    private Key key;
+	
+	@Persistent
 	Set<Player> players;
+	
 	final int MINCOUNT = 3;
+	
+	@Persistent
 	int maxGranularity;
-	Set<Player> playerTurnList;
+	
+	@Persistent
+	int playerTurnIndex;
+	
+	@Persistent
 	boolean turnInProgress;
+	
+	@Persistent
 	int playersWaiting;
+	
+	@Persistent
 	Set<Metric> currentMetrics;
 	
 	//indicates whether the winning value is the highest or the lowest
@@ -23,7 +47,7 @@ public class Game {
 	
 	public Game(){
 		players = new HashSet<Player>();
-		playerTurnList = new HashSet<Player>();
+		playerTurnIndex = 0;
 		turnInProgress = false;
 		playersWaiting = 0;
 	}
@@ -49,17 +73,8 @@ public class Game {
 			if(!turnInProgress){//A turn is in progress when the first player calls
 				turnInProgress = true;
 				
-				Iterator<Player> it = playerTurnList.iterator();
-				//remove any players who have left from the turn list
-				while(it.hasNext()){
-					Player temp = it.next();
-					if(!players.contains(temp))
-						playerTurnList.remove(temp);
-				}
+				playerTurnIndex = (playerTurnIndex + 1) % players.size();
 				
-				//select the next player
-				it = playerTurnList.iterator();
-				nextPlayer = it.next();
 				currentMetrics = chooseMetrics();
 			}
 			//wait for all players before returning
