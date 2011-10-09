@@ -24,7 +24,7 @@ public class Lobby {
     private Key key;
 	
 	@Persistent
-	Set<Player> currentPlayers;
+	Set<Key> currentPlayers;
 	
 	@Persistent
 	List<Game> gamesInProgress;
@@ -34,13 +34,13 @@ public class Lobby {
 	
 	public Lobby(){
 		key = KeyFactory.createKey(Lobby.class.getSimpleName(), Lobby.SINGLETON_KEY);
-		currentPlayers = new HashSet<Player>();
+		currentPlayers = new HashSet<Key>();
 		gamesInProgress = new LinkedList<Game>();
 		gamesInProgress.add(new Game());
 	}
 	
 	public void join(Player p){
-		currentPlayers.add(p);
+		currentPlayers.add(p.getKey());
 		
 	}
 	
@@ -59,7 +59,7 @@ public class Lobby {
 		return temp;
 	}
 	
-	public Set<Player> getPlayers(){
+	public Set<Key> getPlayers(){
 		return currentPlayers;
 	}
 

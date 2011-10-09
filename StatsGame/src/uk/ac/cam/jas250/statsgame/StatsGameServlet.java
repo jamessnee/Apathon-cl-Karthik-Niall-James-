@@ -50,6 +50,7 @@ public class StatsGameServlet extends HttpServlet {
 			
 			}
 			
+			
 			REQUEST_TYPE rq = REQUEST_TYPE.class.getEnumConstants()[Integer.parseInt(req.getParameter(HEADER_RQTYPE))];
 			Gson gson = new Gson();
 			Player p;
@@ -59,7 +60,8 @@ public class StatsGameServlet extends HttpServlet {
 				return;
 			}
 	
-			
+			System.out.println(gson.toJson(l));
+			System.out.println(rq);
 			switch (rq) {
 			case CREATE_PLAYER:
 				String name = req.getParameter(HEADER_NEWPLAYER);
@@ -73,6 +75,8 @@ public class StatsGameServlet extends HttpServlet {
 				p = pm.getObjectById(Player.class, Long.parseLong(req
 						.getParameter(HEADER_PLAYERID)));
 				l.join(p);
+
+				System.out.println(gson.toJson(l));
 				resp.getWriter().println(gson.toJson(l));
 				break;
 			case JOIN_GAME:
@@ -99,6 +103,8 @@ public class StatsGameServlet extends HttpServlet {
 				resp.getWriter().println(gson.toJson(winner));
 				break;
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
 			pm.close();
 		}
