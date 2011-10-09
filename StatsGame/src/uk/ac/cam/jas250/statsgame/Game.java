@@ -21,8 +21,13 @@ public class Game {
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Key key;
 	
+	public enum GAME_STATE { PRE_START, COLLECT_CARDS, CHOOSE, GET_RESULT };
+	
 	@Persistent
-	Set<Player> players;
+	public GAME_STATE currentState;
+	
+	@Persistent
+	Set<Key> players;
 	
 	final int MINCOUNT = 3;
 	
@@ -30,7 +35,7 @@ public class Game {
 	int maxGranularity;
 	
 	@Persistent
-	int playerTurnIndex;
+	Key choosingPlayer;
 	
 	@Persistent
 	boolean turnInProgress;
@@ -46,13 +51,14 @@ public class Game {
 	static final int LOWWIN = -1;
 	
 	public Game(){
-		players = new HashSet<Player>();
-		playerTurnIndex = 0;
+		players = new HashSet<Key>();
+		choosingPlayer = null;
 		turnInProgress = false;
 		playersWaiting = 0;
+		currentState = GAME_STATE.PRE_START;
 	}
 	
-	public Set<Player> getPlayers(){
+	public Set<Key> getPlayers(){
 		return players;
 	}
 	
@@ -60,27 +66,15 @@ public class Game {
 		return players.size() >= MINCOUNT;
 	}
 	
-	public Card getCard(Player p){
-		//wait for all players to call for next card (in case players have left)
-		Player nextPlayer = null;
-		joinPlayers();
+	public Card getCard(Key playerKey){
 		
 		//now the player list is finalised for this turn
 		if(players.size() < 2){//not enough players, end game
 			return new Card(null, false, true);
 		}
 		else{//deal cards	
-			if(!turnInProgress){//A turn is in progress when the first player calls
-				turnInProgress = true;
-				
-				playerTurnIndex = (playerTurnIndex + 1) % players.size();
-				
-				currentMetrics = chooseMetrics();
-			}
-			//wait for all players before returning
-			joinPlayers();	
-			return new Card(getPlayerStats(p, currentMetrics), 
-					p.equals(nextPlayer), false);
+			return new Card(getPlayerStats(playerKey, currentMetrics), 
+					playerKey.equals(choosingPlayer), false);
 		}
 	}
 	
@@ -88,19 +82,19 @@ public class Game {
 	 * Player with turn passes chosen metric, other
 	 * players pass null, return winning player
 	 */
-	public Player choose(Metric chosenMetric, int direction){
-		Iterator<Player> it = players.iterator();
-		Player winningPlayer = it.next(); //choose any player to initialise
-		String region = NeighbourhoodStatQuery.getRegionFromPostcode(
-				winningPlayer.getPostcode(), chosenMetric.getGranularity());
+	public void choose(Metric chosenMetric, int direction){
+		Iterator<Key> it = players.iterator();
+		Player winningPlayer = PMF.get().getPersistenceManager().getObjectById(Player.class, it.next()); //choose any player to initialise
+		String region = NeighbourhoodStatQuery.getAreasFromPostcode(
+				winningPlayer.getPostcode())[chosenMetric.getGranularity()];
 		Stat s = NeighbourhoodStatQuery.getStat(chosenMetric, region);
 		double currentBest = s.getValue();
 		
 		if (chosenMetric != null){ //if called by choosing player...
 			while(it.hasNext()){
-				Player testPlayer = it.next();
-				region = NeighbourhoodStatQuery.getRegionFromPostcode(
-						testPlayer.getPostcode(), chosenMetric.getGranularity());
+				Player testPlayer = PMF.get().getPersistenceManager().getObjectById(Player.class, it.next());
+				region = NeighbourhoodStatQuery.getAreasFromPostcode(
+						testPlayer.getPostcode())[chosenMetric.getGranularity()];
 				s = NeighbourhoodStatQuery.getStat(chosenMetric, region);
 				if(direction == HIGHWIN && s.getValue() > currentBest){
 					currentBest = s.getValue();
@@ -109,26 +103,14 @@ public class Game {
 				else if(direction == LOWWIN && s.getValue() < currentBest){
 					currentBest = s.getValue();
 					winningPlayer = testPlayer;
-				}		
+				}	
 			}
+			currentState = GAME_STATE.GET_RESULT;
 		}
 		
 		//wait for all players and return
-		joinPlayers();
-		return winningPlayer;
 	}
 	
-	private void joinPlayers(){//wait for all players before returning
-		playersWaiting++;
-		while(playersWaiting < players.size()){
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		playersWaiting = 0;
-	}
 	
 	private void calcMaxGranularity(){
 		//TODO calc this
@@ -141,7 +123,7 @@ public class Game {
 		return new HashSet<Metric>();
 	}
 	
-	private Set<Stat> getPlayerStats(Player p, Set<Metric> metrics){
+	private Set<Stat> getPlayerStats(Key p, Set<Metric> metrics){
 		Set<Stat> s = new HashSet<Stat>();
 		Iterator<Metric> it = metrics.iterator();
 		while(it.hasNext()){
@@ -150,10 +132,64 @@ public class Game {
 		return s;
 	}
 	
-	private Stat getPlayerStat(Player p, Metric m){
-		String region = NeighbourhoodStatQuery.getRegionFromPostcode(
-				p.getPostcode(), m.getGranularity());
+	private Stat getPlayerStat(Key p, Metric m){
+		String region = NeighbourhoodStatQuery.getAreasFromPostcode(
+				PMF.get().getPersistenceManager().getObjectById(Player.class, p).getPostcode())[m.getGranularity()];
 		return NeighbourhoodStatQuery.getStat(m, region);
 	}
+	
+	public GAME_STATE getState() {
+		if (currentState == GAME_STATE.PRE_START) {
+			if (ready()) dealCards();
+		}
+		if (currentState == GAME_STATE.COLLECT_CARDS) {
+			Iterator<Key> i = players.iterator();
+			for (;i.hasNext();) {
+				Key next = i.next();
+				Player p = PMF.get().getPersistenceManager().getObjectById(Player.class, next);
+				if (!p.getCollected())
+					break;
+				
+				
+			}
+			if (!i.hasNext())
+				currentState = GAME_STATE.CHOOSE;
+		}
+		
+		
+		
+		return currentState;
+	}
+	
+	private void dealCards() {
+		Iterator<Key> i = players.iterator();
+		Key first = i.next();
+		Key next = first;
+		boolean found = false;
+		for (;i.hasNext();) {
+			if (found) {
+				choosingPlayer = next;
+				found = false;
+				break;
+			}
+			if (next.equals(choosingPlayer))
+				found = true;
+			next = i.next();
+		}
+
+		if (found || choosingPlayer == null)
+			choosingPlayer = first;
+		
+		i = players.iterator();
+		for (;i.hasNext();) {
+			next = i.next();
+			Player p = PMF.get().getPersistenceManager().getObjectById(Player.class, next);
+			p.setCollected(false);
+		}
+			
+		currentState = GAME_STATE.COLLECT_CARDS;
+		
+	}
+	
 
 }

@@ -23,6 +23,8 @@ public class Player {
 	@Persistent
 	private String postcode;
 	
+	@Persistent
+	private boolean collectedCard;
 	
 	/*
 	 * CONSTRUCTORS
@@ -30,6 +32,7 @@ public class Player {
 	public Player(String name, String postcode){
 		this.setName(name);
 		this.setPostcode(postcode);
+		collectedCard = false;
 		//REMOVE just for testing
 		//key = KeyFactory.createKey(Player.class.getSimpleName(), name.length());
 	}
@@ -74,6 +77,14 @@ public class Player {
 	
 	public void updateScore(int newScore){
 		score = newScore;
+	}
+
+	public void setCollected(boolean flag) {
+		collectedCard = flag;
+	}
+
+	public boolean getCollected() {
+		return collectedCard;
 	}
 
 }

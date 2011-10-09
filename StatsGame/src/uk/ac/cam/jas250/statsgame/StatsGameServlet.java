@@ -23,7 +23,7 @@ public class StatsGameServlet extends HttpServlet {
 	public final String HEADER_DIRECTION = "direction";
 
 	public enum REQUEST_TYPE {
-		CREATE_PLAYER, UPDATE_PLAYER, JOIN_LOBBY, JOIN_GAME, GET_CARD, CHOOSE, LEAVE_GAME
+		CREATE_PLAYER, UPDATE_PLAYER, JOIN_LOBBY, JOIN_GAME, GET_CARD, CHOOSE, LEAVE_GAME, QUERY_POSTCODE, QUERY_STATE
 	};
 
 	
@@ -82,14 +82,14 @@ public class StatsGameServlet extends HttpServlet {
 			case JOIN_GAME:
 				p = pm.getObjectById(Player.class, Long.parseLong(req
 						.getParameter(HEADER_PLAYERID)));
-				resp.getWriter().println(gson.toJson(l.getGame(p)));
+				resp.getWriter().println(gson.toJson(l.joinGame(p.getKey())));
 				break;
 
 			case GET_CARD:
 				p = pm.getObjectById(Player.class, Long.parseLong(req
 						.getParameter(HEADER_PLAYERID)));
 				Game g = pm.getObjectById(Game.class, Long.parseLong(req.getParameter(HEADER_GAMEID)));
-				Card c = g.getCard(p);
+				Card c = g.getCard(p.getKey());
 				resp.getWriter().println(gson.toJson(c));
 				break;
 			case CHOOSE:
@@ -99,9 +99,21 @@ public class StatsGameServlet extends HttpServlet {
 				Metric m = pm.getObjectById(Metric.class, Long.parseLong(req.getParameter(HEADER_METRICID)));
 				
 				int dir = Integer.parseInt(req.getParameter(HEADER_DIRECTION));
-				Player winner = g.choose(m, dir);
-				resp.getWriter().println(gson.toJson(winner));
+				g.choose(m, dir);
+				resp.getWriter().println(gson.toJson(null));
 				break;
+			case QUERY_POSTCODE:
+				postcode = req.getParameter(HEADER_POSTCODE);
+				resp.getWriter().println(gson.toJson(NeighbourhoodStatQuery.getAreasFromPostcode(postcode)));
+				break;
+				
+			case QUERY_STATE:
+				p = pm.getObjectById(Player.class, Long.parseLong(req
+						.getParameter(HEADER_PLAYERID)));
+				g = pm.getObjectById(Game.class, Long.parseLong(req.getParameter(HEADER_GAMEID)));
+				resp.getWriter().println(gson.toJson(g.getState()));
+				break;
+			
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

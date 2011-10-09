@@ -44,21 +44,15 @@ public class Lobby {
 		
 	}
 	
-	public Game getGame(Player p){
-		Game nextGame = ((LinkedList<Game>)gamesInProgress).getFirst();
-		nextGame.getPlayers().add(p);
-		while(!nextGame.ready()){
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+	public Game joinGame(Key playerKey){
+		Game nextGame = gamesInProgress.get(0);
+		nextGame.getPlayers().add(playerKey);
+		if (nextGame.ready()){
+			gamesInProgress.add(0,new Game());
 		}
-		Game temp = nextGame;
-		nextGame = new Game();
-		return temp;
+		return nextGame;
 	}
-	
+		
 	public Set<Key> getPlayers(){
 		return currentPlayers;
 	}

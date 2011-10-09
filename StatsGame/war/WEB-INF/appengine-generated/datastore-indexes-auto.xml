@@ -1,4 +1,10 @@
-<!-- Indices written at Sun, 9 Oct 2011 01:01:39 UTC -->
+<!-- Indices written at Sun, 9 Oct 2011 09:44:27 UTC -->
 
-<datastore-indexes/>
+<datastore-indexes>
 
+    <!-- Used 1 time in query history -->
+    <datastore-index kind="Game" ancestor="true" source="auto">
+        <property name="gamesInProgress_INTEGER_IDX" direction="asc"/>
+    </datastore-index>
+
+</datastore-indexes>
