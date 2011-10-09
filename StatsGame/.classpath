@@ -3,10 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-<<<<<<< HEAD
-	<classpathentry kind="lib" path="/home/niall/Appathon/Apathon-cl-Karthik-Niall-James-/StatsGame/war/WEB-INF/lib/gson-1.7.1.jar"/>
-=======
-	<classpathentry kind="lib" path="/Users/jamessnee/Documents/WorkSpace/Apathon-cl-Karthik-Niall-James-/StatsGame/war/WEB-INF/lib/gson-1.7.1.jar"/>
->>>>>>> 9dafe38f7f72dd20d7cb9d47d1efbadf02fa3123
+	<classpathentry kind="lib" path="C:/Users/Karthik/workspace/statsgame/Apathon-cl-Karthik-Niall-James-/StatsGame/war/WEB-INF/lib/gson-1.7.1.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

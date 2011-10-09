@@ -56,19 +56,19 @@ public class StatsGameServlet extends HttpServlet {
 			Player p;
 
 			if (rq == null) {
-				resp.getWriter().println(gson.toJson("No request"));
+				resp.getWriter().print(gson.toJson("No request"));
 				return;
 			}
 	
-			System.out.println(gson.toJson(l));
-			System.out.println(rq);
+			System.out.print(gson.toJson(l));
+			System.out.print(rq);
 			switch (rq) {
 			case CREATE_PLAYER:
 				String name = req.getParameter(HEADER_NEWPLAYER);
 				String postcode = req.getParameter(HEADER_POSTCODE);
 				p = new Player(name, postcode);
 				pm.makePersistent(p);
-				resp.getWriter().println(gson.toJson(p.getKey().getId()));
+				resp.getWriter().print(gson.toJson(p.getKey().getId()));
 				break;
 			case JOIN_LOBBY:
 				
@@ -76,13 +76,13 @@ public class StatsGameServlet extends HttpServlet {
 						.getParameter(HEADER_PLAYERID)));
 				l.join(p);
 
-				System.out.println(gson.toJson(l));
-				resp.getWriter().println(gson.toJson(l));
+				System.out.print(gson.toJson(l));
+				resp.getWriter().print(gson.toJson(l));
 				break;
 			case JOIN_GAME:
 				p = pm.getObjectById(Player.class, Long.parseLong(req
 						.getParameter(HEADER_PLAYERID)));
-				resp.getWriter().println(gson.toJson(l.joinGame(p.getKey())));
+				resp.getWriter().print(gson.toJson(l.joinGame(p.getKey())));
 				break;
 
 			case GET_CARD:
@@ -90,7 +90,7 @@ public class StatsGameServlet extends HttpServlet {
 						.getParameter(HEADER_PLAYERID)));
 				Game g = pm.getObjectById(Game.class, Long.parseLong(req.getParameter(HEADER_GAMEID)));
 				Card c = g.getCard(p.getKey());
-				resp.getWriter().println(gson.toJson(c));
+				resp.getWriter().print(gson.toJson(c));
 				break;
 			case CHOOSE:
 				p = pm.getObjectById(Player.class, Long.parseLong(req
@@ -100,18 +100,18 @@ public class StatsGameServlet extends HttpServlet {
 				
 				int dir = Integer.parseInt(req.getParameter(HEADER_DIRECTION));
 				g.choose(m, dir);
-				resp.getWriter().println(gson.toJson(null));
+				resp.getWriter().print(gson.toJson(null));
 				break;
 			case QUERY_POSTCODE:
 				postcode = req.getParameter(HEADER_POSTCODE);
-				resp.getWriter().println(gson.toJson(NeighbourhoodStatQuery.getAreasFromPostcode(postcode)));
+				resp.getWriter().print(gson.toJson(NeighbourhoodStatQuery.getAreasFromPostcode(postcode)));
 				break;
 				
 			case QUERY_STATE:
 				p = pm.getObjectById(Player.class, Long.parseLong(req
 						.getParameter(HEADER_PLAYERID)));
 				g = pm.getObjectById(Game.class, Long.parseLong(req.getParameter(HEADER_GAMEID)));
-				resp.getWriter().println(gson.toJson(g.getState()));
+				resp.getWriter().print(gson.toJson(g.getState()));
 				break;
 			
 			}
