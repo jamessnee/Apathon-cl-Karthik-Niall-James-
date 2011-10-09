@@ -36,7 +36,7 @@ public class StatsGameServlet extends HttpServlet {
 
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-
+		
 		resp.setContentType("application/json");
 
 		PersistenceManager pm = PMF.get().getPersistenceManager();
